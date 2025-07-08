@@ -1,26 +1,25 @@
 package com.miguel_barcelo.async_signup_user.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.miguel_barcelo.async_signup_user.model.User;
+import com.miguel_barcelo.async_signup_user.event.UserRegisteredEvent;
 
 @Service
 public class UserService {
 	
-	private final NotificationService notificationService;
-	private final AuditService auditService;
+	private final ApplicationEventPublisher eventPublisher;
 	
-	public UserService(NotificationService notificationService, AuditService auditService) {
-		this.notificationService = notificationService;
-		this.auditService = auditService;
+	public UserService(ApplicationEventPublisher eventPublisher) {
+		this.eventPublisher = eventPublisher;
 	}
 	
 	public void registerUser(User user) {
 		// Simulate saving record
 		System.out.println("💾 Saving user to DB: " + user.getName());
 		
-		// Async tasks
-		notificationService.sendWelcomeEmail(user);
-		auditService.logUserRegistration(user);
+		// Launch the event
+		eventPublisher.publishEvent(new UserRegisteredEvent(user));
 	}
 }
